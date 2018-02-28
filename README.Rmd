@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/sophiasagan/R_Capstone.svg?branch=master)](https://travis-ci.org/sophiasagan/R_Capstone)
+
+
 ## Capstone project - R software development
 
 This project provides functions for the cleaning and visualization of the
