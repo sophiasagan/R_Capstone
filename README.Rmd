@@ -1,0 +1,56 @@
+## Capstone project - R software development
+
+This project provides functions for the cleaning and visualization of the
+NOOA Dataset. In particular, it provides:
+
+- Functions for cleaning data, parsing strings, converting fields in the appropriate format
+- Functions for visualizing data over time
+- Functions for visualizing data over space
+
+## NOOA Dataset info
+
+This capstone project will be centered around a dataset obtained from the U.S. National Oceanographic and Atmospheric Administration (NOAA) on significant earthquakes around the world. This dataset contains information about 5,933 earthquakes over an approximately 4,000 year time span.
+
+## Parsing data
+
+`eq_clean_data` converts time information to Date class,
+it converts the longitude and latitude information to numeric
+and it applies the `eq_location_clean` function to LOCATION_NAME field.
+
+```{r, eval=FALSE}
+earthquakes <- capstone::eq_clean_data( readr::read_delim("signif.txt",delim="\t") )
+```
+
+## Visualization over time
+
+`geom_timeline` visualizes the times at which earthquakes occur within
+certain countries. In addition, it displays the magnitudes (i.e. Richter
+scale value) and the number of deaths associated with each earthquake.
+`geom_timeline_label` adds labels of the earthquakes on a Timeline representation.
+
+```{r, eval=FALSE}
+ggplot2::ggplot(data = to_plot) +
+  ggplot2::geom_segment(ggplot2::aes(x = x, xend = xmax, y = COUNTRY, yend = COUNTRY),
+               alpha = 0.5, color = "gray") +
+  capstone::geom_timeline(ggplot2::aes(x = date, y = COUNTRY, i = INTENSITY, d = DEATHS)) +
+  ggplot2::geom_segment(data = to_plot2, ggplot2::aes(x = date, xend = date, y = COUNTRY, yend = as.numeric(COUNTRY) + 0.25),
+               alpha = 0.5, color = "gray") +
+  capstone::geom_timeline_label(data = to_plot2, ggplot2::aes(x = date, y = as.numeric(COUNTRY) + 0.4, label = LOCATION_NAME)) +
+  ggplot2::theme_minimal()
+```
+
+## Visualization over space
+
+`eq_map` maps the epicenters (LATITUDE/LONGITUDE) and annotates
+each point in a pop up window containing annotation data stored in a
+column of the data frame.
+`eq_create_label`creates an HTML label for the leaflet map
+containing the location cleaned by the `eq_location_clean` function,
+the magnitude (EQ_PRIMARY), and the total number of deaths (TOTAL_DEATHS).
+
+```{r, eval=FALSE}
+out <- capstone::eq_clean_data(out)
+out <- dplyr::filter(out, COUNTRY == "MEXICO" & lubridate::year(date) >= 2000)
+out <- dplyr::mutate(out, popup_text = capstone::eq_create_label(out))
+capstone::eq_map(out, annot_col = "popup_text")
+```
